@@ -4,6 +4,7 @@ import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.info.License;
+import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -17,8 +18,7 @@ public class OpenApiConfig {
                         .title("ArchPilot")
                         .version("1.0")
                         .description("""
-                                Have wondered how to get the free space either restaurant ,offices , weeding gardens on time .
-                                Space sync provides the ready-to consume API for reservation
+                                Need to have the system design  and architecture as a non-technical person.ArchPilot is your solution
                                 
                                 [Continue with Google](http://localhost:8082/oauth2/authorization/google)
                                 [Continue with Github](http://localhost:8082/oauth2/authorization/github)
@@ -28,7 +28,19 @@ public class OpenApiConfig {
                                 .url("https://archPilot.vercel.app")
                                 .name("ArchPilot."))
                         .license(new License()
-                                .name("Apache 2.0")));
+                                .name("Apache 2.0"))
+                )
+                .addServersItem(
+                        new Server()
+                                .url("http://localhost:8082/")
+                                .description("Local ArchPilot Server")
+                )
+                .addServersItem(
+                        new Server()
+                                .url("https://archPilot.vercel.app")
+                                .description("Deployed ArchPilot Server")
+                )
+                ;
 
     }
 }
