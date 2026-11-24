@@ -12,17 +12,16 @@ import org.springframework.context.annotation.Configuration;
 public class OpenApiConfig {
 
     @Bean
-    public OpenAPI openApi(){
+    public OpenAPI openApi() {
         return new OpenAPI()
                 .info(new Info()
                         .title("ArchPilot")
                         .version("1.0")
                         .description("""
-                                Need to have the system design  and architecture as a non-technical person.ArchPilot is your solution
-                                
-                                [Continue with Google](http://localhost:8082/oauth2/authorization/google)
-                                [Continue with Github](http://localhost:8082/oauth2/authorization/github)
-                                
+                                Need to have the system design and architecture as a non-technical person. ArchPilot is your solution.
+
+                                [Continue with Google](/oauth2/authorization/google)
+                                [Continue with Github](/oauth2/authorization/github)
                                 """)
                         .contact(new Contact()
                                 .url("https://archPilot.vercel.app")
@@ -32,15 +31,13 @@ public class OpenApiConfig {
                 )
                 .addServersItem(
                         new Server()
-                                .url("http://localhost:8082/")
+                                .url("http://localhost:8082")
                                 .description("Local ArchPilot Server")
                 )
                 .addServersItem(
                         new Server()
-                                .url("https://ai-powered-system-design-architecture-assistant-production.up.railway.app/")
+                                .url("https://ai-powered-system-design-architecture-assistant-production.up.railway.app")
                                 .description("Deployed ArchPilot Server")
-                )
-                ;
-
+                );
     }
 }
