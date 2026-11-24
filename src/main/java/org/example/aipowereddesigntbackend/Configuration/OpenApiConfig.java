@@ -37,7 +37,7 @@ public class OpenApiConfig {
                 )
                 .addServersItem(
                         new Server()
-                                .url("https://archPilot.vercel.app")
+                                .url("https://ai-powered-system-design-architecture-assistant-production.up.railway.app/")
                                 .description("Deployed ArchPilot Server")
                 )
                 ;
