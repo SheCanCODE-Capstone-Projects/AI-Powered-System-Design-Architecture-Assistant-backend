@@ -3,6 +3,7 @@ package org.example.aipowereddesigntbackend.ExceptionHandling;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -71,11 +72,29 @@ public class GlobalExceptionHandler {
     }
 
 
-    @ExceptionHandler({UsernameNotFoundException.class})
+    @ExceptionHandler({UsernameNotFoundException.class, ResourceNotFoundException.class})
     public ResponseEntity<Map<String, Object>> handleNotFound(RuntimeException ex) {
         return new ResponseEntity<>(
                 buildErrorBody(HttpStatus.NOT_FOUND, ex.getMessage()),
                 HttpStatus.NOT_FOUND
+        );
+    }
+
+
+    @ExceptionHandler(ConflictException.class)
+    public ResponseEntity<Map<String, Object>> handleConflict(ConflictException ex) {
+        return new ResponseEntity<>(
+                buildErrorBody(HttpStatus.CONFLICT, ex.getMessage()),
+                HttpStatus.CONFLICT
+        );
+    }
+
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<Map<String, Object>> handleAccessDenied(AccessDeniedException ex) {
+        return new ResponseEntity<>(
+                buildErrorBody(HttpStatus.FORBIDDEN, ex.getMessage()),
+                HttpStatus.FORBIDDEN
         );
     }
 }

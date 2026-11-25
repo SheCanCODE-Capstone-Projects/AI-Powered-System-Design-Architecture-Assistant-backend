@@ -283,11 +283,12 @@ Controllers receive HTTP requests from the frontend and return API responses.
 | File | Responsibility |
 |------|----------------|
 | `AuthController.java` | Handles user registration and login requests |
-| `ProjectController.java` | Exposes endpoints for managing projects |
-| `ComponentController.java` | Handles component CRUD requests |
+| `ProjectController.java` | Project CRUD, collaborator invitations, project membership, and project-scoped component creation/listing - every endpoint rooted at `/api/projects` |
+| `ComponentController.java` | Updates and deletes an existing component by its own ID (`/api/components/{id}`) |
 | `ConnectionController.java` | Handles creation and deletion of connections |
 | `DiagramController.java` | Returns generated Mermaid diagrams |
 | `ReviewController.java` | Triggers and retrieves architecture reviews |
+| `InvitationController.java` | Lets an invited user list their invitations and accept/decline them by token (`/api/invitations/**`) |
 
 **Implementation Guidelines:**
 
