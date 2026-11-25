@@ -52,11 +52,9 @@ The backend is responsible for:
 
 - **Graph Validation:** Ensure that connected components belong to the same project, prevent self-loops, and reject invalid component references.
 
-- **Authentication:** Authenticate users via Google or GitHub OAuth2 login (session-based, through Spring Security's `oauth2Login`). Each authenticated identity is persisted as a local `Account`.
+- **Authentication:** Authenticate users using JWT-based authentication.
 
-- **Ownership Authorization:** Ensure users can only access and manage projects they own or collaborate on. Enforced centrally by `OwnershipValidator`, not re-implemented per service.
-
-- **Collaboration:** A project has exactly one OWNER (its creator) and any number of accepted COLLABORATORs. The owner invites a collaborator by email; the invitee logs in (Google or GitHub, using that same email) and accepts a time-limited emailed link to become a COLLABORATOR. Roles are project-specific - the same user can own one project and collaborate on another. Collaborators can view/edit project details and manage components; only the owner can invite, revoke invitations, remove collaborators, or delete the project. See [Collaboration](#collaboration) below.
+- **Ownership Authorization:** Ensure users can only access and manage projects they own.
 
 ### 2. Automatic Mermaid Diagram Generation
 
@@ -126,16 +124,9 @@ archpilot-backend/
 │   │   │   │   ├── DiagramController.java
 │   │   │   │   │   # Exposes Mermaid diagram generation APIs.
 │   │   │   │   │
-│   │   │   │   ├── ReviewController.java
-│   │   │   │   │   # Triggers architecture reviews and
-│   │   │   │   │   # retrieves previous review findings.
-│   │   │   │   │
-│   │   │   │   └── InvitationController.java
-│   │   │   │       # Lets an invited user list their invitations
-│   │   │   │       # and accept/decline them by token. Owner-side
-│   │   │   │       # invitation and membership management live on
-│   │   │   │       # ProjectController, since those are addressed
-│   │   │   │       # by project ID (see REST API Reference).
+│   │   │   │   └── ReviewController.java
+│   │   │   │       # Triggers architecture reviews and
+│   │   │   │       # retrieves previous review findings.
 │   │   │   │
 │   │   │   ├── dto/
 │   │   │   │   # Defines request and response data structures.
@@ -153,32 +144,16 @@ archpilot-backend/
 │   │   │   │   ├── DiagramResponse.java
 │   │   │   │   │   # Returns generated Mermaid syntax.
 │   │   │   │   │
-│   │   │   │   ├── ReviewFindingDto.java
-│   │   │   │   │   # Represents structured architecture
-│   │   │   │   │   # review findings returned to clients.
-│   │   │   │   │
-│   │   │   │   ├── InviteCollaboratorDto.java
-│   │   │   │   │   # Email address to invite as a collaborator.
-│   │   │   │   │
-│   │   │   │   └── ProjectMembershipDto.java
-│   │   │   │       # An invitation's or membership's status,
-│   │   │   │       # role, and the project/account it refers to.
+│   │   │   │   └── ReviewFindingDto.java
+│   │   │   │       # Represents structured architecture
+│   │   │   │       # review findings returned to clients.
 │   │   │   │
 │   │   │   ├── exception/
 │   │   │   │   # Centralizes application exception handling.
 │   │   │   │   │
-│   │   │   │   ├── GlobalExceptionHandler.java
-│   │   │   │   │   # Converts exceptions into consistent
-│   │   │   │   │   # HTTP error responses.
-│   │   │   │   │
-│   │   │   │   ├── ResourceNotFoundException.java
-│   │   │   │   │   # A requested project/component/invitation/
-│   │   │   │   │   # member does not exist -> 404.
-│   │   │   │   │
-│   │   │   │   └── ConflictException.java
-│   │   │   │       # A request is well-formed but violates a
-│   │   │   │       # business rule (duplicate invite, already a
-│   │   │   │       # member, expired invitation) -> 409.
+│   │   │   │   └── GlobalExceptionHandler.java
+│   │   │   │       # Converts exceptions into consistent
+│   │   │   │       # HTTP error responses.
 │   │   │   │
 │   │   │   ├── model/
 │   │   │   │   # JPA entities representing database tables.
@@ -196,17 +171,9 @@ archpilot-backend/
 │   │   │   │   │   # Represents a directional relationship
 │   │   │   │   │   # between architecture components.
 │   │   │   │   │
-│   │   │   │   ├── ReviewFinding.java
-│   │   │   │   │   # Stores identified architecture issues
-│   │   │   │   │   # and recommended improvements.
-│   │   │   │   │
-│   │   │   │   ├── ProjectMember.java
-│   │   │   │   │   # A user's role (OWNER or COLLABORATOR) on one
-│   │   │   │   │   # project, and who invited them, if anyone.
-│   │   │   │   │
-│   │   │   │   └── ProjectInvitation.java
-│   │   │   │       # A pending/accepted/declined/revoked
-│   │   │   │       # collaboration invite, keyed by a token.
+│   │   │   │   └── ReviewFinding.java
+│   │   │   │       # Stores identified architecture issues
+│   │   │   │       # and recommended improvements.
 │   │   │   │
 │   │   │   ├── repository/
 │   │   │   │   # Provides database access using Spring Data JPA.
@@ -224,34 +191,18 @@ archpilot-backend/
 │   │   │   │   ├── ConnectionRepository.java
 │   │   │   │   │   # Stores and retrieves component connections.
 │   │   │   │   │
-│   │   │   │   ├── ReviewFindingRepository.java
-│   │   │   │   │   # Persists and retrieves review history.
-│   │   │   │   │
-│   │   │   │   ├── ProjectMemberRepository.java
-│   │   │   │   │   # Queries project membership by project,
-│   │   │   │   │   # by account, or both.
-│   │   │   │   │
-│   │   │   │   └── ProjectInvitationRepository.java
-│   │   │   │       # Looks up invitations by token, by project,
-│   │   │   │       # or by invited email.
+│   │   │   │   └── ReviewFindingRepository.java
+│   │   │   │       # Persists and retrieves review history.
 │   │   │   │
 │   │   │   ├── security/
 │   │   │   │   # Implements authentication and authorization.
 │   │   │   │   │
 │   │   │   │   ├── JwtAuthenticationFilter.java
-
-
 │   │   │   │   │   # Validates JWT tokens for protected requests.
 │   │   │   │   │
 │   │   │   │   └── OwnershipValidator.java
-│   │   │   │       # Resolves the authenticated Account and
-│   │   │   │       # enforces project-level access: membership
-│   │   │   │       # (owner or accepted collaborator) for
-│   │   │   │       # collaborative actions, ownership for
-│   │   │   │       # administrative/destructive ones. The single
-│   │   │   │       # place every service asks "can this caller
-│   │   │   │       # touch this project" instead of each one
-│   │   │   │       # re-implementing the check itself.
+│   │   │   │       # Verifies that the authenticated user
+│   │   │   │       # owns the requested project.
 │   │   │   │
 │   │   │   ├── service/
 │   │   │   │   # Contains application business logic.
@@ -273,20 +224,9 @@ archpilot-backend/
 │   │   │   │   ├── DeterministicCheckService.java
 │   │   │   │   │   # Runs rule-based architecture checks.
 │   │   │   │   │
-│   │   │   │   ├── AiReviewService.java
-│   │   │   │   │   # Integrates with the AI provider, validates
-│   │   │   │   │   # responses, and stores review findings.
-│   │   │   │   │
-│   │   │   │   ├── InvitationService.java
-│   │   │   │   │   # Invites, lists, revokes, and accepts/declines
-│   │   │   │   │   # collaborator invitations; lists/removes
-│   │   │   │   │   # project members.
-│   │   │   │   │
-│   │   │   │   └── EmailService.java
-│   │   │   │       # Sends the invitation email via the Brevo
-│   │   │   │       # transactional email API. Delivery failures
-│   │   │   │       # are logged, never rolled back into the
-│   │   │   │       # invitation itself.
+│   │   │   │   └── AiReviewService.java
+│   │   │   │       # Integrates with the AI provider, validates
+│   │   │   │       # responses, and stores review findings.
 │   │   │   │
 │   │   │   └── ArchPilotApplication.java
 │   │   │       # Main Spring Boot application entry point.
