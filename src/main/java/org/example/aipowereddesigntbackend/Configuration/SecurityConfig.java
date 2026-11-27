@@ -44,7 +44,7 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService)
                         )
                         .defaultSuccessUrl(
-                                "https://ai-powered-system-design-architecture.onrender.com/dashboard",
+                                "https://ai-powered-system-design-architecture.onrender.com/dev/dashboard",
                                 true
                         )
                 )
