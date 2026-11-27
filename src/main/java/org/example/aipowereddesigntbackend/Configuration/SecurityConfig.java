@@ -1,6 +1,7 @@
 package org.example.aipowereddesigntbackend.Configuration;
 
 import org.example.aipowereddesigntbackend.Service.Authentication.CustomOAuth2UserService;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -17,6 +18,9 @@ import java.util.List;
 public class SecurityConfig {
 
     private final CustomOAuth2UserService customOAuth2UserService;
+
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
     public SecurityConfig(CustomOAuth2UserService customOAuth2UserService) {
         this.customOAuth2UserService = customOAuth2UserService;
@@ -43,10 +47,7 @@ public class SecurityConfig {
                         .userInfoEndpoint(userInfo -> userInfo
                                 .userService(customOAuth2UserService)
                         )
-                        .defaultSuccessUrl(
-                                "/swagger-ui/index.html",
-                                true
-                        )
+                        .defaultSuccessUrl(frontendUrl + "/dashboard", true)
                 )
                 .logout(logout -> logout
                         .logoutSuccessUrl("/")
