@@ -44,7 +44,7 @@ public class SecurityConfig {
                                 .userService(customOAuth2UserService)
                         )
                         .defaultSuccessUrl(
-                                "/swagger-ui/index.html",
+                                "https://ai-powered-system-design-architecture.onrender.com/dashboard",
                                 true
                         )
                 )
